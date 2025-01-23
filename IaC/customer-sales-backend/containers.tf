@@ -27,6 +27,18 @@ resource "azurerm_container_app" "main" {
     type = "SystemAssigned"
   }
 
+  ingress {
+    allow_insecure_connections = false
+    external_enabled           = true
+    target_port                = 8080
+    transport                  = "auto"
+
+    traffic_weight {
+      latest_revision = true
+      percentage      = 100
+    }
+  }
+
   secret {
     name  = "registry-credentials"
     value = data.azurerm_container_registry.cr.admin_password
@@ -82,4 +94,3 @@ resource "azurerm_container_app" "main" {
     }
   }
 }
-
