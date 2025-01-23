@@ -23,6 +23,10 @@ resource "azurerm_container_app" "main" {
 
   revision_mode = "Single"
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   secret {
     name  = "registry-credentials"
     value = data.azurerm_container_registry.cr.admin_password
