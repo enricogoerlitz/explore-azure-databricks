@@ -34,5 +34,5 @@ func main() {
 	}
 
 	// Start the server
-	router.Run("0.0.0.0:80")
+	router.Run(":8080")
 }
