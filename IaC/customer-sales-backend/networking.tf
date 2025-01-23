@@ -65,6 +65,40 @@ resource "azurerm_network_security_group" "default_private_nsg" {
   })
 }
 
+resource "azurerm_network_security_group" "https_nsg" {
+  name                = "eadb-https-${terraform.workspace}-nsg"
+  location            = var.westeurope_location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "Allow-HTTPS-Inbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-HTTPS-Outbound"
+    priority                   = 101
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = merge(var.default_tags, {
+    "env" = terraform.workspace
+  })
+}
+
 resource "azurerm_subnet" "azure_function" {
   name                 = local.vnet.subnet_names.azure_function
   resource_group_name  = azurerm_resource_group.main.name
@@ -137,5 +171,5 @@ resource "azurerm_subnet" "container_apps_env" {
 
 resource "azurerm_subnet_network_security_group_association" "container_apps_env_nsg_association" {
   subnet_id                 = azurerm_subnet.container_apps_env.id
-  network_security_group_id = azurerm_network_security_group.default_private_nsg.id
+  network_security_group_id = azurerm_network_security_group.https_nsg.id
 }

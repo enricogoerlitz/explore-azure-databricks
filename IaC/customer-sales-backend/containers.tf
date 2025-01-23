@@ -52,14 +52,14 @@ resource "azurerm_container_app" "main" {
 
   template {
     min_replicas = 1
-    
+
     http_scale_rule {
       concurrent_requests = "10"
       name                = "http-scaler"
     }
 
     container {
-      name   = "app"
+      name   = "customersales-restapi"
       image  = "eadbprojectweucr.azurecr.io/restapi:v1-${terraform.workspace}"
       cpu    = 0.5
       memory = "1.0Gi"
