@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_server_pe
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=adminpw1! # username=sa
+    ports:
+      - "1433:1433"  # Default SQL Server port
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

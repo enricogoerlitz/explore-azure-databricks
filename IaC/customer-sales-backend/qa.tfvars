@@ -1,0 +1,1 @@
+app_service_plan_sku_name = "EP1"
