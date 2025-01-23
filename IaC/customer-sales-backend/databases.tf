@@ -1,7 +1,3 @@
-// TODOs:
-// remove administrator login and password
-// create an service user for the database
-
 resource "azurerm_cosmosdb_account" "main" {
   name                = "eadb-${terraform.workspace}-weu-cdb"
   location            = var.westeurope_location
@@ -48,8 +44,8 @@ resource "azurerm_mssql_server" "main" {
   resource_group_name           = azurerm_resource_group.main.name
   location                      = var.westeurope_location
   version                       = "12.0"
-  administrator_login           = "adminuser"
-  administrator_login_password  = "adminpw1!"
+  administrator_login           = var.db_sa_username
+  administrator_login_password  = var.db_sa_password
   public_network_access_enabled = false
 
   tags = merge(var.default_tags, {
