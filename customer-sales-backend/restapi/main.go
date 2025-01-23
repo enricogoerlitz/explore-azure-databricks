@@ -25,7 +25,7 @@ func main() {
 	// Release actions
 	if isRelease {
 		logrus.Info("Running in release mode")
-		// gin.SetMode(gin.ReleaseMode)
+		gin.SetMode(gin.ReleaseMode)
 		database.MigrateDBModels()
 	} else {
 		logrus.Info("Running in debug mode")
