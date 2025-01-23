@@ -36,3 +36,10 @@ resource "azurerm_role_assignment" "function_app_kv_secrets_user" {
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_linux_function_app.productviews.identity[0].principal_id
 }
+
+resource "azurerm_role_assignment" "container_app_kv_secrets_user" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_container_app.main.identity[0].principal_id
+  depends_on           = [azurerm_container_app.main]
+}

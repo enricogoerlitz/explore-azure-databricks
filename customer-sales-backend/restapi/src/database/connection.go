@@ -48,12 +48,12 @@ func ConnectDB() {
 func getDatabaseCredentials() (string, string, error) {
 	if os.Getenv("MODE") == "release" {
 		logrus.Info("Getting database credentials from Azure Key Vault")
-		username, err := getKeyVaultSecret("DB_USER_KV_SECRET_NAME")
+		username, err := getKeyVaultSecret(os.Getenv("DB_USER_KV_SECRET_NAME"))
 		if err != nil {
 			return "", "", err
 		}
 
-		password, err := getKeyVaultSecret("DB_PASSWORD_KV_SECRET_NAME")
+		password, err := getKeyVaultSecret(os.Getenv("DB_PASSWORD_KV_SECRET_NAME"))
 		if err != nil {
 			return "", "", err
 		}

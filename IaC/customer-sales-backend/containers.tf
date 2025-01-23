@@ -23,6 +23,22 @@ resource "azurerm_container_app" "main" {
 
   revision_mode = "Single"
 
+  identity {
+    type = "SystemAssigned"
+  }
+
+  ingress {
+    allow_insecure_connections = false
+    external_enabled           = true
+    target_port                = 8080
+    transport                  = "auto"
+
+    traffic_weight {
+      latest_revision = true
+      percentage      = 100
+    }
+  }
+
   secret {
     name  = "registry-credentials"
     value = data.azurerm_container_registry.cr.admin_password
@@ -35,8 +51,15 @@ resource "azurerm_container_app" "main" {
   }
 
   template {
+    min_replicas = 1
+
+    http_scale_rule {
+      concurrent_requests = "10"
+      name                = "http-scaler"
+    }
+
     container {
-      name   = "app"
+      name   = "customersales-restapi"
       image  = "eadbprojectweucr.azurecr.io/restapi:v1-${terraform.workspace}"
       cpu    = 0.5
       memory = "1.0Gi"
@@ -78,4 +101,3 @@ resource "azurerm_container_app" "main" {
     }
   }
 }
-
