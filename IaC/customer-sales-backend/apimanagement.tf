@@ -1,7 +1,7 @@
 # disabled, because it spends to much time
 
 # resource "azurerm_api_management" "main" {
-#   name                = "eadb-${terraform.workspace}-weu-apim2"
+#   name                = "eadb-${terraform.workspace}-weu-apim"
 #   location            = var.westeurope_location
 #   resource_group_name = azurerm_resource_group.main.name
 #   publisher_name      = "Enrico Goerlitz"

@@ -56,3 +56,6 @@ Add two APIs:
 ### 4. DNS Mapping
 
 Add the API Management endpoint to Route 53.
+
+[🔗 How to configure an Curstom Domain](https://learn.microsoft.com/en-us/azure/app-service/manage-custom-dns-migrate-domain#1-get-a-domain-verification-id)
+
