@@ -10,7 +10,7 @@ import os
 KEYVAULT_URL = os.environ["KEYVAULT_URL"]
 COSMOS_DB_ENDPOINT = os.environ["COSMOS_DB_ENDPOINT"]
 
-COSMOS_DB_SECRET_NAME = "cosmos-db-access-key-2"
+COSMOS_DB_SECRET_NAME = "cosmos-db-access-key"
 COSMOS_DB_DATABASE_NAME = "CustomerSales"
 COSMOS_DB_CONTAINER_NAME = "ProductViews"
 

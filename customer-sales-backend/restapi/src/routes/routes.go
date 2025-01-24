@@ -5,7 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var API_PREFIX = "/customersales/api"
+var API_PREFIX = "/api"
 
 func SetupRoutes(router *gin.Engine) {
 	logrus.Info("Setting up V1 routes")
