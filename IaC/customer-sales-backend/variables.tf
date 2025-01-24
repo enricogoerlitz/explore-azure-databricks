@@ -37,6 +37,11 @@ variable "app_service_plan_sku_name" {
   default     = "EP1"
 }
 
+variable "api_management_sku_name" {
+  description = "The SKU name for the API Management. Specified in the environment variables."
+  type        = string
+}
+
 variable "db_sa_username" {
   description = "The username for the database server admin"
   type        = string
