@@ -1,4 +1,5 @@
-# Costs to much time
+# disabled, because it spends to much time
+
 # resource "azurerm_api_management" "main" {
 #   name                = "eadb-${terraform.workspace}-weu-apim2"
 #   location            = var.westeurope_location
