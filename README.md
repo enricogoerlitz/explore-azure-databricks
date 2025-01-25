@@ -1,6 +1,7 @@
 # 🎓 Project: expore-azure-databricks
 
 [![Build and Push restapi Image](https://github.com/enricogoerlitz/explore-azure-databricks-project/actions/workflows/build-push-image.restapi.yml/badge.svg)](https://github.com/enricogoerlitz/explore-azure-databricks-project/actions/workflows/build-push-image.restapi.yml)
+[![Push Metadata to Azure Storage](https://github.com/enricogoerlitz/explore-azure-databricks-project/actions/workflows/push-metadata.datahub.yml/badge.svg)](https://github.com/enricogoerlitz/explore-azure-databricks-project/actions/workflows/push-metadata.datahub.yml)
 
 ## Motivation
 
