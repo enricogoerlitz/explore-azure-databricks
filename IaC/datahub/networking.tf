@@ -69,39 +69,81 @@ resource "azurerm_network_security_group" "databricks_public_nsg" {
   resource_group_name = azurerm_resource_group.main.name
 
   security_rule {
-    name                       = "AllowInternetOutbound"
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-eventhub"
+    priority                   = 104
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "9093"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "EventHub"
+    description                = "Required for worker communication with Azure Eventhub services."
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-inbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    description                = "Required for worker nodes communication within a cluster."
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-outbound"
     priority                   = 100
     direction                  = "Outbound"
     access                     = "Allow"
     protocol                   = "*"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "Internet"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    description                = "Required for worker nodes communication within a cluster."
   }
 
   security_rule {
-    name                       = "AllowAzureLoadBalancerInbound"
-    priority                   = 200
-    direction                  = "Inbound"
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-sql"
+    priority                   = 102
+    direction                  = "Outbound"
     access                     = "Allow"
-    protocol                   = "*"
+    protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "AzureLoadBalancer"
-    destination_address_prefix = "*"
+    destination_port_range     = "3306"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "Sql"
+    description                = "Required for workers communication with Azure SQL services."
   }
 
   security_rule {
-    name                       = "DenyAllInbound"
-    priority                   = 300
-    direction                  = "Inbound"
-    access                     = "Deny"
-    protocol                   = "*"
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-storage"
+    priority                   = 103
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "Storage"
+    description                = "Required for workers communication with Azure Storage services."
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-databricks-cp"
+    priority                   = 101
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureDatabricks"
+    description                = "Required for workers communication with Databricks control plane."
   }
 }
 
@@ -113,7 +155,7 @@ resource "azurerm_network_security_group" "databricks_private_nsg" {
 
   security_rule {
     name                       = "AllowDatabricksControlPlane"
-    priority                   = 100
+    priority                   = 101
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "*"
@@ -133,6 +175,84 @@ resource "azurerm_network_security_group" "databricks_private_nsg" {
     destination_port_range     = "*"
     source_address_prefix      = "*"
     destination_address_prefix = "VirtualNetwork"
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-eventhub"
+    priority                   = 104
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "9093"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "EventHub"
+    description                = "Required for worker communication with Azure Eventhub services."
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-inbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    description                = "Required for worker nodes communication within a cluster."
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-outbound"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    description                = "Required for worker nodes communication within a cluster."
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-sql"
+    priority                   = 102
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "3306"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "Sql"
+    description                = "Required for workers communication with Azure SQL services."
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-storage"
+    priority                   = 103
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "Storage"
+    description                = "Required for workers communication with Azure Storage services."
+  }
+
+  security_rule {
+    name                       = "Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-databricks-cp"
+    priority                   = 101
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureDatabricks"
+    description                = "Required for workers communication with Databricks control plane."
   }
 
   security_rule {
@@ -211,10 +331,10 @@ resource "azurerm_subnet" "databricks_private" {
     service_delegation {
       name = "Microsoft.Databricks/workspaces"
       actions = [
-        "Microsoft.Network/virtualNetworks/subnets/action",
+        # "Microsoft.Network/virtualNetworks/subnets/action",
         "Microsoft.Network/virtualNetworks/subnets/join/action",
         "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
-        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action"
       ]
     }
   }
@@ -235,7 +355,12 @@ resource "azurerm_subnet" "databricks_public" {
     name = "databricks_workspaces_delegation"
     service_delegation {
       name = "Microsoft.Databricks/workspaces"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+      actions = [
+        # "Microsoft.Network/virtualNetworks/subnets/action",
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action"
+      ]
     }
   }
 }
