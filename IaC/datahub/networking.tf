@@ -6,15 +6,19 @@ locals {
       datalake_pe   = "eadb-dlpe-${terraform.workspace}-snet"
       cosmosdb_pe   = "eadb-cdbpe-${terraform.workspace}-snet"
       sql_server_pe = "eadb-sqls-${terraform.workspace}-snet"
+      databricks_private = "eadb-adb-pvt-${terraform.workspace}-snet"
+      databricks_public = "eadb-adb-pub-${terraform.workspace}-snet"
     }
     env = {
       dev = {
-        vnet_address_space = ["10.0.12.0/22"]
+        vnet_address_space = ["10.0.12.0/26"]
         subnet_address_spaces = {
-          keyvault_pe   = ["10.0.12.16/29"]
-          cosmosdb_pe   = ["10.0.12.24/29"]
-          sql_server_pe = ["10.0.12.32/29"]
-          datalake_pe   = ["10.0.12.40/29"]
+          keyvault_pe   = ["10.0.12.0/29"]
+          cosmosdb_pe   = ["10.0.12.8/29"]
+          sql_server_pe = ["10.0.12.16/29"]
+          datalake_pe   = ["10.0.12.24/29"]
+          databricks_private = ["10.0.12.32/28"]
+          databricks_public = ["10.0.12.48/28"]
         }
       }
       # qa = {
@@ -57,6 +61,91 @@ resource "azurerm_network_security_group" "default_private_nsg" {
   tags = merge(var.default_tags, {
     "env" = terraform.workspace
   })
+}
+
+resource "azurerm_network_security_group" "databricks_public_nsg" {
+  name                = "databricks-public-nsg"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "AllowInternetOutbound"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "Internet"
+  }
+
+  security_rule {
+    name                       = "AllowAzureLoadBalancerInbound"
+    priority                   = 200
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "AzureLoadBalancer"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "DenyAllInbound"
+    priority                   = 300
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+
+resource "azurerm_network_security_group" "databricks_private_nsg" {
+  name                = "databricks-private-nsg"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "AllowDatabricksControlPlane"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "AzureDatabricks"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "AllowPrivateOutbound"
+    priority                   = 200
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "VirtualNetwork"
+  }
+
+  security_rule {
+    name                       = "DenyAllInbound"
+    priority                   = 300
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 }
 
 resource "azurerm_subnet" "keyvault_pe" {
@@ -109,4 +198,49 @@ resource "azurerm_subnet" "datalake_pe" {
 resource "azurerm_subnet_network_security_group_association" "datalake_pe_nsg_association" {
   subnet_id                 = azurerm_subnet.datalake_pe.id
   network_security_group_id = azurerm_network_security_group.default_private_nsg.id
+}
+
+resource "azurerm_subnet" "databricks_private" {
+  name                 = local.vnet.subnet_names.databricks_private
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = local.vnet.env[terraform.workspace].subnet_address_spaces.databricks_private
+
+  delegation {
+    name = "databricks_workspaces_delegation"
+    service_delegation {
+      name = "Microsoft.Databricks/workspaces"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/action",
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+      ]
+    }
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "databricks_private_nsg_association" {
+  subnet_id                 = azurerm_subnet.databricks_private.id
+  network_security_group_id = azurerm_network_security_group.databricks_private_nsg.id
+}
+
+resource "azurerm_subnet" "databricks_public" {
+  name                 = local.vnet.subnet_names.databricks_public
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = local.vnet.env[terraform.workspace].subnet_address_spaces.databricks_public
+
+  delegation {
+    name = "databricks_workspaces_delegation"
+    service_delegation {
+      name = "Microsoft.Databricks/workspaces"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "databricks_public_nsg_association" {
+  subnet_id                 = azurerm_subnet.databricks_public.id
+  network_security_group_id = azurerm_network_security_group.databricks_public_nsg.id
 }
