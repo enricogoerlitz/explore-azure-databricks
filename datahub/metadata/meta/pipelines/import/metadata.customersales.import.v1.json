@@ -1,0 +1,85 @@
+{
+    "$version": "v1",
+    "$type": "STANDARD_IMPORT",
+
+    "$ignoreTestsEntireFile": false,
+    "$ignoreTestsGlobalDuplicateDestinations": false,
+
+    "name": "customersales",
+    "version": "v1",
+    "description": "Import and silver layer for customer sales data",
+
+    "importSettings": {
+        "active": true,
+
+        "sourceSystem": {
+            "database": "",
+            "defaultSchema": "dbo"
+        },
+
+        "dataHub": {
+            "defaultSchema": "dbo"
+        }
+    },
+
+    "longTemplate": {
+        "run": true,
+        "historize": true,
+        "deltaLoad": {
+            "enable": false,
+            "deltaColumn": "TIMESTEMP",
+            "useBroadcast": true
+        },
+        "source": {
+            "schema": "",
+            "tablename": ""
+        },
+        "bronze": {
+            "schema": "",
+            "tablename": ""
+        },
+        "silver": {
+            "notebook": {
+                "schema": "",
+                "tablename": "",
+                "nk_columns": "id1,id2,id3...",
+                "partition_by": "YEAR,MONTH,DAY",
+                "exclude_columns_from_comparing": null,
+                "include_columns_from_comparing": null
+            }
+        }
+    },
+
+    "shortTemplate": {
+        "run": true,
+        "source": {
+            "tablename": ""
+        },
+        "bronze": {},
+        "silver": {
+            "notebook": {
+                "nk_columns": ""
+            }
+        }
+    },
+
+    "tables": [
+        {
+            "run": true,
+            "deltaLoad": {
+                "enable": true,
+                "deltaColumn": "updated_at",
+                "useBroadcast": false
+            },
+            "source": {
+                "tablename": "distributors"
+            },
+            "bronze": {},
+            "silver": {
+                "notebook": {
+                    "nk_columns": "id"
+                }
+            }
+        }
+    ]
+}

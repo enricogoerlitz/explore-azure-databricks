@@ -14,6 +14,22 @@ resource "azurerm_storage_account" "dl" {
   })
 }
 
+resource "azurerm_storage_account" "metadata" {
+  name                            = "eadbmd${terraform.workspace}weusa"
+  resource_group_name             = azurerm_resource_group.main.name
+  location                        = var.westeurope_location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  is_hns_enabled                  = true
+  allow_nested_items_to_be_public = false
+  public_network_access_enabled   = true
+
+
+  tags = merge(var.default_tags, {
+    "env" = terraform.workspace
+  })
+}
+
 resource "azurerm_storage_container" "gold" {
   name                  = "gold"
   storage_account_id    = azurerm_storage_account.dl.id
@@ -33,7 +49,7 @@ resource "azurerm_storage_container" "bronze" {
 }
 
 resource "azurerm_storage_container" "metadata" {
-  name                  = "meta"
-  storage_account_id    = azurerm_storage_account.dl.id
+  name                  = "datahub-metadata"
+  storage_account_id    = azurerm_storage_account.metadata.id
   container_access_type = "private"
 }
