@@ -2,17 +2,19 @@ locals {
   vnet = {
     name = "eadb-${terraform.workspace}-weu-vnet-002"
     subnet_names = {
-      keyvault_pe        = "eadb-kvpe-${terraform.workspace}-snet"
-      cosmosdb_pe        = "eadb-cdbpe-${terraform.workspace}-snet"
-      sql_server_pe      = "eadb-sqls-${terraform.workspace}-snet"
+      keyvault_pe   = "eadb-kvpe-${terraform.workspace}-snet"
+      datalake_pe   = "eadb-dlpe-${terraform.workspace}-snet"
+      cosmosdb_pe   = "eadb-cdbpe-${terraform.workspace}-snet"
+      sql_server_pe = "eadb-sqls-${terraform.workspace}-snet"
     }
     env = {
       dev = {
         vnet_address_space = ["10.0.12.0/22"]
         subnet_address_spaces = {
-          keyvault_pe        = ["10.0.12.16/29"]
-          cosmosdb_pe        = ["10.0.12.24/29"]
-          sql_server_pe      = ["10.0.12.32/29"]
+          keyvault_pe   = ["10.0.12.16/29"]
+          cosmosdb_pe   = ["10.0.12.24/29"]
+          sql_server_pe = ["10.0.12.32/29"]
+          datalake_pe   = ["10.0.12.40/29"]
         }
       }
       # qa = {
@@ -70,28 +72,41 @@ resource "azurerm_subnet_network_security_group_association" "keyvault_pe_nsg_as
   network_security_group_id = azurerm_network_security_group.default_private_nsg.id
 }
 
-resource "azurerm_subnet" "cosmosdb_pe" {
-  name                 = local.vnet.subnet_names.cosmosdb_pe
+# resource "azurerm_subnet" "cosmosdb_pe" {
+#   name                 = local.vnet.subnet_names.cosmosdb_pe
+#   resource_group_name  = azurerm_resource_group.main.name
+#   virtual_network_name = azurerm_virtual_network.main.name
+#   address_prefixes     = local.vnet.env[terraform.workspace].subnet_address_spaces.cosmosdb_pe
+#   service_endpoints    = ["Microsoft.AzureCosmosDB"]
+# }
+
+# resource "azurerm_subnet_network_security_group_association" "cosmosdb_pe_nsg_association" {
+#   subnet_id                 = azurerm_subnet.cosmosdb_pe.id
+#   network_security_group_id = azurerm_network_security_group.default_private_nsg.id
+# }
+
+# resource "azurerm_subnet" "sql_server_pe" {
+#   name                 = local.vnet.subnet_names.sql_server_pe
+#   resource_group_name  = azurerm_resource_group.main.name
+#   virtual_network_name = azurerm_virtual_network.main.name
+#   address_prefixes     = local.vnet.env[terraform.workspace].subnet_address_spaces.sql_server_pe
+#   service_endpoints    = ["Microsoft.Sql"]
+# }
+
+# resource "azurerm_subnet_network_security_group_association" "sql_server_pe_nsg_association" {
+#   subnet_id                 = azurerm_subnet.sql_server_pe.id
+#   network_security_group_id = azurerm_network_security_group.default_private_nsg.id
+# }
+
+resource "azurerm_subnet" "datalake_pe" {
+  name                 = local.vnet.subnet_names.datalake_pe
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = local.vnet.env[terraform.workspace].subnet_address_spaces.cosmosdb_pe
-  service_endpoints    = ["Microsoft.AzureCosmosDB"]
+  address_prefixes     = local.vnet.env[terraform.workspace].subnet_address_spaces.datalake_pe
+  service_endpoints    = ["Microsoft.Storage"]
 }
 
-resource "azurerm_subnet_network_security_group_association" "cosmosdb_pe_nsg_association" {
-  subnet_id                 = azurerm_subnet.cosmosdb_pe.id
-  network_security_group_id = azurerm_network_security_group.default_private_nsg.id
-}
-
-resource "azurerm_subnet" "sql_server_pe" {
-  name                 = local.vnet.subnet_names.sql_server_pe
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = local.vnet.env[terraform.workspace].subnet_address_spaces.sql_server_pe
-  service_endpoints    = ["Microsoft.Sql"]
-}
-
-resource "azurerm_subnet_network_security_group_association" "sql_server_pe_nsg_association" {
-  subnet_id                 = azurerm_subnet.sql_server_pe.id
+resource "azurerm_subnet_network_security_group_association" "datalake_pe_nsg_association" {
+  subnet_id                 = azurerm_subnet.datalake_pe.id
   network_security_group_id = azurerm_network_security_group.default_private_nsg.id
 }
