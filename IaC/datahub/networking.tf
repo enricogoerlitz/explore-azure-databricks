@@ -2,23 +2,23 @@ locals {
   vnet = {
     name = "eadb-${terraform.workspace}-weu-vnet-002"
     subnet_names = {
-      keyvault_pe   = "eadb-kvpe-${terraform.workspace}-snet"
-      datalake_pe   = "eadb-dlpe-${terraform.workspace}-snet"
-      cosmosdb_pe   = "eadb-cdbpe-${terraform.workspace}-snet"
-      sql_server_pe = "eadb-sqls-${terraform.workspace}-snet"
+      keyvault_pe        = "eadb-kvpe-${terraform.workspace}-snet"
+      datalake_pe        = "eadb-dlpe-${terraform.workspace}-snet"
+      cosmosdb_pe        = "eadb-cdbpe-${terraform.workspace}-snet"
+      sql_server_pe      = "eadb-sqls-${terraform.workspace}-snet"
       databricks_private = "eadb-adb-pvt-${terraform.workspace}-snet"
-      databricks_public = "eadb-adb-pub-${terraform.workspace}-snet"
+      databricks_public  = "eadb-adb-pub-${terraform.workspace}-snet"
     }
     env = {
       dev = {
         vnet_address_space = ["10.0.12.0/26"]
         subnet_address_spaces = {
-          keyvault_pe   = ["10.0.12.0/29"]
-          cosmosdb_pe   = ["10.0.12.8/29"]
-          sql_server_pe = ["10.0.12.16/29"]
-          datalake_pe   = ["10.0.12.24/29"]
+          keyvault_pe        = ["10.0.12.0/29"]
+          cosmosdb_pe        = ["10.0.12.8/29"]
+          sql_server_pe      = ["10.0.12.16/29"]
+          datalake_pe        = ["10.0.12.24/29"]
           databricks_private = ["10.0.12.32/28"]
-          databricks_public = ["10.0.12.48/28"]
+          databricks_public  = ["10.0.12.48/28"]
         }
       }
       # qa = {
