@@ -48,6 +48,12 @@ resource "azurerm_storage_container" "bronze" {
   container_access_type = "private"
 }
 
+resource "azurerm_storage_container" "demo" {
+  name                  = "bronze"
+  storage_account_id    = azurerm_storage_account.dl.id
+  container_access_type = "private"
+}
+
 resource "azurerm_storage_container" "metadata" {
   name                  = "datahub-metadata"
   storage_account_id    = azurerm_storage_account.metadata.id

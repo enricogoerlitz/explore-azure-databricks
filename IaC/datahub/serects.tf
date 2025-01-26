@@ -17,7 +17,7 @@ resource "azurerm_key_vault" "main" {
   public_network_access_enabled = false
 
   # Enable Azure RBAC for access control
-  enable_rbac_authorization = true
+  enable_rbac_authorization = false
   purge_protection_enabled  = true
 
   tags = merge(var.default_tags, {

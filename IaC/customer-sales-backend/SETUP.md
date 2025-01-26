@@ -34,7 +34,7 @@ $ tfapply
 
 ## Manual Tasks
 
-### 1. Add keys to key vault
+### 1. Add Keys to Key Vault
 
 1. `cosmos-db-access-key` => CosmosDB Primary Key
 2. `sql-database-username` => SQL Server username

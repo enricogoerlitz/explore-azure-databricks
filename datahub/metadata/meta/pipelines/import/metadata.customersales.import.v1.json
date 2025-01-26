@@ -80,6 +80,108 @@
                     "nk_columns": "id"
                 }
             }
+        },
+        {
+            "run": true,
+            "deltaLoad": {
+                "enable": true,
+                "deltaColumn": "updated_at",
+                "useBroadcast": false
+            },
+            "source": {
+                "tablename": "users"
+            },
+            "bronze": {},
+            "silver": {
+                "notebook": {
+                    "nk_columns": "id"
+                }
+            }
+        },
+        {
+            "run": true,
+            "deltaLoad": {
+                "enable": true,
+                "deltaColumn": "updated_at",
+                "useBroadcast": false
+            },
+            "source": {
+                "tablename": "regions"
+            },
+            "bronze": {},
+            "silver": {
+                "notebook": {
+                    "nk_columns": "id"
+                }
+            }
+        },
+        {
+            "run": true,
+            "deltaLoad": {
+                "enable": true,
+                "deltaColumn": "updated_at",
+                "useBroadcast": false
+            },
+            "source": {
+                "tablename": "products"
+            },
+            "bronze": {},
+            "silver": {
+                "notebook": {
+                    "nk_columns": "id"
+                }
+            }
+        },
+        {
+            "run": true,
+            "deltaLoad": {
+                "enable": true,
+                "deltaColumn": "updated_at",
+                "useBroadcast": false
+            },
+            "source": {
+                "tablename": "product_categories"
+            },
+            "bronze": {},
+            "silver": {
+                "notebook": {
+                    "nk_columns": "id"
+                }
+            }
+        },
+        {
+            "run": true,
+            "deltaLoad": {
+                "enable": true,
+                "deltaColumn": "updated_at",
+                "useBroadcast": false
+            },
+            "source": {
+                "tablename": "orders"
+            },
+            "bronze": {},
+            "silver": {
+                "notebook": {
+                    "nk_columns": "id"
+                }
+            }
+        },
+        {
+            "run": true,
+            "deltaLoad": {
+                "enable": true,
+                "deltaColumn": "updated_at",
+                "useBroadcast": true
+            },
+            "source": {
+                "tablename": "order_items"
+            },
+            "bronze": {},
+            "silver": {
+                "notebook": {
+                    "nk_columns": "id"
+                }
+            }
         }
     ]
 }
