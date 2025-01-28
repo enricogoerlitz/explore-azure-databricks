@@ -207,7 +207,10 @@
 										"value": "@coalesce(\n    item().silver?.notebook?.tablename,\n    item().bronze?.tablename,\n    item().source.tablename\n)\n",
 										"type": "Expression"
 									},
-									"NK_COLUMNS": "@item().silver.notebook.nk_columns",
+									"NK_COLUMNS": {
+										"value": "@item().silver.notebook.nk_columns",
+										"type": "Expression"
+									},
 									"IS_DELTA_LOAD": "false",
 									"DELTA_LOAD_USE_BROADCAST": "false",
 									"EXCLUDE_COLUMNS_FROM_COMPARING": {
