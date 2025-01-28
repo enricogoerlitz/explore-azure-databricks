@@ -23,7 +23,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@concat(\n    dataset().env,\n    'datahub/metadata/meta/pipelines/import'\n)",
+					"value": "@concat(\n    dataset().env,\n    '/datahub/metadata/meta/pipelines/import'\n)",
 					"type": "Expression"
 				},
 				"container": "datahub-metadata"
