@@ -7,6 +7,54 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "eadb-dev-weu-adf"
 		},
+		"ADB_DEV_CustomerSalesWS_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'ADB_DEV_CustomerSalesWS'"
+		},
+		"ADLS2_DEV_DataLake_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ADLS2_DEV_DataLake'"
+		},
+		"BLOB_DEV_MetadataRepository_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'BLOB_DEV_MetadataRepository'"
+		},
+		"SQLS_DEV_CustomerSales_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'SQLS_DEV_CustomerSales'"
+		},
+		"ADLS2_DEV_DataLake_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://eadbdldevweusa.dfs.core.windows.net/"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "eadb-dev-weu-sqls.database.windows.net"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "customersales"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminuser"
+		},
+		"ADLS2_DEV_DATAHUB_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/012e925b-f538-41ef-8d23-b0c85e7dbe7b/resourceGroups/explore-azure-databricks-dh-dev-weu-rg/providers/Microsoft.Storage/storageAccounts/eadbdldevweusa"
+		},
+		"ADLS2_DEV_DATAHUB_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"SQL_DEV_CUSTOMERSALES_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/012e925b-f538-41ef-8d23-b0c85e7dbe7b/resourceGroups/explore-azure-databricks-be-dev-weu-rg/providers/Microsoft.Sql/servers/eadb-dev-weu-sqls"
+		},
+		"SQL_DEV_CUSTOMERSALES_properties_groupId": {
+			"type": "string",
+			"defaultValue": "sqlServer"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -33,6 +81,42 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"ADB_DEV_CustomerSalesWS_accessToken": {
+						"value": "[parameters('ADB_DEV_CustomerSalesWS_accessToken')]"
+					},
+					"BLOB_DEV_MetadataRepository_connectionString": {
+						"value": "[parameters('BLOB_DEV_MetadataRepository_connectionString')]"
+					},
+					"ADLS2_DEV_DataLake_accountKey": {
+						"value": "[parameters('ADLS2_DEV_DataLake_accountKey')]"
+					},
+					"SQLS_DEV_CustomerSales_password": {
+						"value": "[parameters('SQLS_DEV_CustomerSales_password')]"
+					},
+					"ADLS2_DEV_DATAHUB_properties_privateLinkResourceId": {
+						"value": "[parameters('ADLS2_DEV_DATAHUB_properties_privateLinkResourceId')]"
+					},
+					"ADLS2_DEV_DATAHUB_properties_groupId": {
+						"value": "[parameters('ADLS2_DEV_DATAHUB_properties_groupId')]"
+					},
+					"SQL_DEV_CUSTOMERSALES_properties_privateLinkResourceId": {
+						"value": "[parameters('SQL_DEV_CUSTOMERSALES_properties_privateLinkResourceId')]"
+					},
+					"SQL_DEV_CUSTOMERSALES_properties_groupId": {
+						"value": "[parameters('SQL_DEV_CUSTOMERSALES_properties_groupId')]"
+					},
+					"ADLS2_DEV_DataLake_properties_typeProperties_url": {
+						"value": "[parameters('ADLS2_DEV_DataLake_properties_typeProperties_url')]"
+					},
+					"SQLS_DEV_CustomerSales_properties_typeProperties_server": {
+						"value": "[parameters('SQLS_DEV_CustomerSales_properties_typeProperties_server')]"
+					},
+					"SQLS_DEV_CustomerSales_properties_typeProperties_database": {
+						"value": "[parameters('SQLS_DEV_CustomerSales_properties_typeProperties_database')]"
+					},
+					"SQLS_DEV_CustomerSales_properties_typeProperties_userName": {
+						"value": "[parameters('SQLS_DEV_CustomerSales_properties_typeProperties_userName')]"
 					}
 				}
 			},

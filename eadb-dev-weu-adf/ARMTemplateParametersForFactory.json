@@ -4,6 +4,42 @@
 	"parameters": {
 		"factoryName": {
 			"value": "eadb-dev-weu-adf"
+		},
+		"ADB_DEV_CustomerSalesWS_accessToken": {
+			"value": ""
+		},
+		"ADLS2_DEV_DataLake_accountKey": {
+			"value": ""
+		},
+		"BLOB_DEV_MetadataRepository_connectionString": {
+			"value": ""
+		},
+		"SQLS_DEV_CustomerSales_password": {
+			"value": ""
+		},
+		"ADLS2_DEV_DataLake_properties_typeProperties_url": {
+			"value": "https://eadbdldevweusa.dfs.core.windows.net/"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_server": {
+			"value": "eadb-dev-weu-sqls.database.windows.net"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_database": {
+			"value": "customersales"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_userName": {
+			"value": "adminuser"
+		},
+		"ADLS2_DEV_DATAHUB_properties_privateLinkResourceId": {
+			"value": "/subscriptions/012e925b-f538-41ef-8d23-b0c85e7dbe7b/resourceGroups/explore-azure-databricks-dh-dev-weu-rg/providers/Microsoft.Storage/storageAccounts/eadbdldevweusa"
+		},
+		"ADLS2_DEV_DATAHUB_properties_groupId": {
+			"value": "dfs"
+		},
+		"SQL_DEV_CUSTOMERSALES_properties_privateLinkResourceId": {
+			"value": "/subscriptions/012e925b-f538-41ef-8d23-b0c85e7dbe7b/resourceGroups/explore-azure-databricks-be-dev-weu-rg/providers/Microsoft.Sql/servers/eadb-dev-weu-sqls"
+		},
+		"SQL_DEV_CUSTOMERSALES_properties_groupId": {
+			"value": "sqlServer"
 		}
 	}
 }

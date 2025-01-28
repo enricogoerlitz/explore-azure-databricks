@@ -6,12 +6,605 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "eadb-dev-weu-adf"
+		},
+		"ADB_DEV_CustomerSalesWS_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'ADB_DEV_CustomerSalesWS'"
+		},
+		"BLOB_DEV_MetadataRepository_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'BLOB_DEV_MetadataRepository'"
+		},
+		"ADLS2_DEV_DataLake_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ADLS2_DEV_DataLake'"
+		},
+		"SQLS_DEV_CustomerSales_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'SQLS_DEV_CustomerSales'"
+		},
+		"ADLS2_DEV_DATAHUB_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/012e925b-f538-41ef-8d23-b0c85e7dbe7b/resourceGroups/explore-azure-databricks-dh-dev-weu-rg/providers/Microsoft.Storage/storageAccounts/eadbdldevweusa"
+		},
+		"ADLS2_DEV_DATAHUB_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"SQL_DEV_CUSTOMERSALES_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/012e925b-f538-41ef-8d23-b0c85e7dbe7b/resourceGroups/explore-azure-databricks-be-dev-weu-rg/providers/Microsoft.Sql/servers/eadb-dev-weu-sqls"
+		},
+		"SQL_DEV_CUSTOMERSALES_properties_groupId": {
+			"type": "string",
+			"defaultValue": "sqlServer"
+		},
+		"ADLS2_DEV_DataLake_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://eadbdldevweusa.dfs.core.windows.net/"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "eadb-dev-weu-sqls.database.windows.net"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "customersales"
+		},
+		"SQLS_DEV_CustomerSales_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminuser"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ADB_DEV_CustomerSalesWS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-3138726414404915.15.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('ADB_DEV_CustomerSalesWS_accessToken')]"
+					},
+					"newClusterNodeType": "Standard_D32s_v3",
+					"newClusterNumOfWorker": "1:100",
+					"newClusterSparkEnvVars": {
+						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+					},
+					"newClusterVersion": "16.1.x-photon-scala2.12",
+					"clusterOption": "Autoscaling",
+					"newClusterInitScripts": []
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BLOB_DEV_MetadataRepository')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('BLOB_DEV_MetadataRepository_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MetadataRepository')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "BLOB_DEV_MetadataRepository",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"env": {
+						"type": "string"
+					},
+					"metadataFilename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().metadataFilename",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@concat(\n    dataset().env,\n    '/datahub/metadata/meta/pipelines/import'\n)",
+							"type": "Expression"
+						},
+						"container": "datahub-metadata"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/BLOB_DEV_MetadataRepository')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerSalesIntegrationRuntime')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "West Europe",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						},
+						"pipelineExternalComputeScaleProperties": {
+							"timeToLive": 60,
+							"numberOfPipelineNodes": 1,
+							"numberOfExternalNodes": 1
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/ADLS2_DEV_DATAHUB')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('ADLS2_DEV_DATAHUB_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('ADLS2_DEV_DATAHUB_properties_groupId')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/SQL_DEV_CUSTOMERSALES')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('SQL_DEV_CUSTOMERSALES_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('SQL_DEV_CUSTOMERSALES_properties_groupId')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ADLS2_DEV_DataLake')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ADLS2_DEV_DataLake_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ADLS2_DEV_DataLake_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "CustomerSalesIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/CustomerSalesIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLS_DEV_CustomerSales')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"server": "[parameters('SQLS_DEV_CustomerSales_properties_typeProperties_server')]",
+					"database": "[parameters('SQLS_DEV_CustomerSales_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "SQL",
+					"userName": "[parameters('SQLS_DEV_CustomerSales_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('SQLS_DEV_CustomerSales_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "CustomerSalesIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/CustomerSalesIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerSalesDataLake')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ADLS2_DEV_DataLake",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container": {
+						"type": "string"
+					},
+					"schema": {
+						"type": "string"
+					},
+					"tablename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().tablename",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().schema",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().container",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ADLS2_DEV_DataLake')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerSalesTables')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLS_DEV_CustomerSales",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"schema": {
+						"type": "string"
+					},
+					"tablename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().schema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().tablename",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLS_DEV_CustomerSales')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/customersales')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get metadata",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "MetadataRepository",
+								"type": "DatasetReference",
+								"parameters": {
+									"env": {
+										"value": "@pipeline().parameters.env",
+										"type": "Expression"
+									},
+									"metadataFilename": {
+										"value": "@pipeline().parameters.metadataFilename",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					},
+					{
+						"name": "Filter by run",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get metadata",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get metadata').output.firstRow.tables",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().run, true)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Import tables",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter by run",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter by run').output.Value",
+								"type": "Expression"
+							},
+							"batchCount": 10,
+							"activities": [
+								{
+									"name": "Load table",
+									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "CustomerSalesTables",
+											"type": "DatasetReference",
+											"parameters": {
+												"schema": {
+													"value": "@coalesce(\n    item().source?.schema,\n    activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema )",
+													"type": "Expression"
+												},
+												"tablename": {
+													"value": "@item().source.tablename",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "CustomerSalesDataLake",
+											"type": "DatasetReference",
+											"parameters": {
+												"container": "bronze",
+												"schema": {
+													"value": "@concat(\n    activity('Get metadata').output.firstRow.name,\n    '/',\n    coalesce(\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n        )\n    )",
+													"type": "Expression"
+												},
+												"tablename": {
+													"value": "@concat(\n    coalesce(\n        item().bronze?.tablename,\n        item().source.tablename\n    ),\n    '.parquet'\n)",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Silver ingestion",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Load table",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Users/rico.goerlitz@gmail.com/explore-azure-databricks-project/datahub/databricks/git/100 etl/002 CUSTOMERSALES/CUSTOMERSALES - BASE PARAM SILVERINGESTION",
+										"baseParameters": {
+											"HISTORIZE": {
+												"value": "@string(\n    coalesce(\n        item()?.historize,\n        'true'\n    )\n)",
+												"type": "Expression"
+											},
+											"SOURCE_LAKEHOUSE": {
+												"value": "@pipeline().parameters.bronzeLakehouse",
+												"type": "Expression"
+											},
+											"SOURCE_SCHEMA": {
+												"value": "@concat(\n    coalesce(\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n    )\n)",
+												"type": "Expression"
+											},
+											"SOURCE_TABLENAME": {
+												"value": "@coalesce(\n    item().bronze?.tablename,\n    item().source?.tablename\n)\n",
+												"type": "Expression"
+											},
+											"DESTINATION_LAKEHOUSE": {
+												"value": "@pipeline().parameters.silverLakehouse",
+												"type": "Expression"
+											},
+											"DESTINATION_SCHEMA": {
+												"value": "@concat(\n    coalesce(\n        item().silver.notebook?.schema,\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n    )\n)",
+												"type": "Expression"
+											},
+											"DESTINATION_TABLENAME": {
+												"value": "@coalesce(\n    item().silver?.notebook?.tablename,\n    item().bronze?.tablename,\n    item().source.tablename\n)\n",
+												"type": "Expression"
+											},
+											"NK_COLUMNS": {
+												"value": "@item().silver.notebook.nk_columns",
+												"type": "Expression"
+											},
+											"IS_DELTA_LOAD": "false",
+											"DELTA_LOAD_USE_BROADCAST": "false",
+											"EXCLUDE_COLUMNS_FROM_COMPARING": {
+												"value": "@coalesce(\n    item().silver.notebook?.exclude_columns_from_comparing,\n    ''\n)",
+												"type": "Expression"
+											},
+											"INCLUDE_COLUMNS_FROM_COMPARING": {
+												"value": "@coalesce(\n    item().silver.notebook?.include_columns_from_comparing,\n    ''\n)",
+												"type": "Expression"
+											},
+											"PARTITION_BY_COLUMNS": {
+												"value": "@coalesce(\n    item().silver.notebook?.partition_by,\n    ''\n)",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ADB_DEV_CustomerSalesWS",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"env": {
+						"type": "string",
+						"defaultValue": "dev"
+					},
+					"metadataFilename": {
+						"type": "string",
+						"defaultValue": "metadata.customersales.import.v1.json"
+					},
+					"bronzeLakehouse": {
+						"type": "string",
+						"defaultValue": "customersales"
+					},
+					"silverLakehouse": {
+						"type": "string",
+						"defaultValue": "silver"
+					}
+				},
+				"folder": {
+					"name": "etl/medallion"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/MetadataRepository')]",
+				"[concat(variables('factoryId'), '/datasets/CustomerSalesTables')]",
+				"[concat(variables('factoryId'), '/datasets/CustomerSalesDataLake')]",
+				"[concat(variables('factoryId'), '/linkedServices/ADB_DEV_CustomerSalesWS')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -31,6 +624,65 @@
 							"variableName": "myVariable",
 							"value": "helloWorld"
 						}
+					},
+					{
+						"name": "Copy table",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "CustomerSalesTables",
+								"type": "DatasetReference",
+								"parameters": {
+									"schema": "dbo",
+									"tablename": "distributors"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "CustomerSalesDataLake",
+								"type": "DatasetReference",
+								"parameters": {
+									"container": "bronze",
+									"schema": "dbo",
+									"tablename": "distributors.parquet"
+								}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -46,7 +698,10 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CustomerSalesTables')]",
+				"[concat(variables('factoryId'), '/datasets/CustomerSalesDataLake')]"
+			]
 		}
 	]
 }
