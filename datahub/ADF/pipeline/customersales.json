@@ -64,6 +64,99 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Import tables",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter by run",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter by run').output.Value",
+						"type": "Expression"
+					},
+					"batchCount": 10,
+					"activities": [
+						{
+							"name": "Load table",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "CustomerSalesTables",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@coalesce(\n    item().source?.schema,\n    activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema )",
+											"type": "Expression"
+										},
+										"tablename": {
+											"value": "@item().source.tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "CustomerSalesDataLake",
+									"type": "DatasetReference",
+									"parameters": {
+										"container": "bronze",
+										"schema": {
+											"value": "@concat(\n    activity('Get metadata').output.firstRow.name,\n    '_',\n    coalesce(\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n        )\n    )",
+											"type": "Expression"
+										},
+										"tablename": {
+											"value": "@concat(\n    coalesce(\n        item().bronze?.tablename,\n        item().source.tablename\n    ),\n    '.parquet'\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
 			}
 		],
 		"parameters": {
