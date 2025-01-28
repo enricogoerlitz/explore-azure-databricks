@@ -8,9 +8,9 @@ from uuid import uuid4
 
 IS_LOCAL = True
 
-ORDER_COUNT = 1000
+ORDER_COUNT = 2
 
-CUSTOMER_SALES_HOST = "http://localhost:8080"
+CUSTOMER_SALES_HOST = "https://eadb-dev-weu-ca.niceforest-817f97fb.westeurope.azurecontainerapps.io" # "http://localhost:8080"
 
 CUSTOMER_SALES_SERVICE_ROUTE = "customersales/api/v1" if not IS_LOCAL else "api/v1"
 CUSTOMER_SALES_ENDPOINT = f"{CUSTOMER_SALES_HOST}/{CUSTOMER_SALES_SERVICE_ROUTE}"
@@ -272,9 +272,9 @@ def create_orders(
 
 
 if __name__ == "__main__":
-    create_distributors(100)
+    create_distributors(110)
     create_users(250)
-    create_regions(100)
+    create_regions(110)
     create_product_categories(200)
 
     user_ids = get_user_ids(0, 100)

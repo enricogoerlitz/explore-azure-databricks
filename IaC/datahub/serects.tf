@@ -25,8 +25,29 @@ resource "azurerm_key_vault" "main" {
   })
 }
 
-resource "azurerm_role_assignment" "me_kv_administrator" {
-  scope                = azurerm_key_vault.main.id
-  role_definition_name = "Key Vault Administrator"
-  principal_id         = data.azurerm_client_config.current.object_id
-}
+# resource "azurerm_key_vault_access_policy" "me_kv_access_policy" {
+#   key_vault_id = azurerm_key_vault.main.id
+#   tenant_id    = data.azurerm_client_config.current.tenant_id
+#   object_id    = data.azurerm_client_config.current.object_id
+
+#   secret_permissions = [
+#     "Get",
+#     "List",
+#     "Set",
+#     "Delete",
+#     "Recover",
+#     "Backup",
+#     "Restore"
+#   ]
+# }
+
+# resource "azurerm_key_vault_access_policy" "app_kv_access_policy" {
+#   key_vault_id = azurerm_key_vault.main.id
+#   tenant_id    = data.azurerm_client_config.current.tenant_id
+#   object_id    = azuread_service_principal.dl_svc_sp.object_id
+
+#   secret_permissions = [
+#     "Get",
+#     "List"
+#   ]
+# }

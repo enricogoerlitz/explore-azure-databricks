@@ -13,7 +13,7 @@
         "active": true,
 
         "sourceSystem": {
-            "database": "",
+            "database": "customersales",
             "defaultSchema": "dbo"
         },
 

@@ -42,6 +42,7 @@ $ tfapply
 1. `dl-svc-client-secret`
 2. `dl-svc-client-id`
 3. `tenant-id`
+4. `cosmos-db-access-key`
 
 ### 3. Setup databricks
 
@@ -49,9 +50,16 @@ $ tfapply
 1. Create Compute Cluster
 2. Create Secret Scope
     - #secrets/createScope
-3. Mount datalake containers
-4. Setup git integration
+3. Setup git integration
     1. DB: User Settings > Linked Accounts > Configure
+4. Mount datalake containers
+
+### 4. Setup Azure Data Factory
+
+1. create Self-Hosted Integration Runtime
+    - Azure > use Virtual Network enabled > CustomerSalesIntegrationRuntime
+2. Manage private endpoints > Create new to
+    - SQL Server Database
 
 
 ### 4. Mount or add Data Lake to Databricks
