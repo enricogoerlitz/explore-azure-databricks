@@ -3,9 +3,9 @@
 ## Prerequisites
 
 1. Azure Subscription
-2. Resource Group: `<YOUR_RESSOURCE_GROUP>`
+2. Resource Group: `<YOUR_RESOURCE_GROUP>`
 3. Storage Account: `<YOUR_BACKEND_STORAGE_ACCOUNT>`
-4. Container: `YOUR_BACKEND_STORAGE_ACCOUNT_CONTAINER>`
+4. Container: `<YOUR_BACKEND_STORAGE_ACCOUNT_CONTAINER>`
 5. Terraform installed locally ("4.15.0")
 6. Visual Studio Code
 
@@ -35,7 +35,7 @@ $ tfapply
 ### 1. Generate Client Secret
 
 1. Go to the registered app
-2. Genereate and copy Client Secret Value
+2. Generate and copy Client Secret Value
 
 ### 2. Add Keys to Key Vault
 
@@ -46,20 +46,9 @@ $ tfapply
 
 ### 3. Setup databricks
 
-
 1. Create Compute Cluster
 2. Create Secret Scope
     - #secrets/createScope
 3. Setup git integration
     1. DB: User Settings > Linked Accounts > Configure
 4. Mount datalake containers
-
-### 4. Setup Azure Data Factory
-
-1. create Self-Hosted Integration Runtime
-    - Azure > use Virtual Network enabled > CustomerSalesIntegrationRuntime
-2. Manage private endpoints > Create new to
-    - SQL Server Database
-
-
-### 4. Mount or add Data Lake to Databricks

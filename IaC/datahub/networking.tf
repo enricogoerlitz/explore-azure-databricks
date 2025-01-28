@@ -14,31 +14,33 @@ locals {
         subnet_address_spaces = {
           keyvault_pe        = ["10.0.12.0/29"]
           cosmosdb_pe        = ["10.0.12.8/29"]
-          datalake_pe      = ["10.0.12.16/29"]
-          # another        = ["10.0.12.24/29"]
+          datalake_pe        = ["10.0.12.16/29"]
           databricks_private = ["10.0.12.32/28"]
           databricks_public  = ["10.0.12.48/28"]
         }
       }
-      # qa = {
-      #   vnet_address_space = ["10.0.4.0/22"]
-      #   subnet_address_spaces = {
-      #     keyvault_pe        = ["10.0.6.16/29"]
-      #     cosmosdb_pe        = ["10.0.6.24/29"]
-      #     sql_server_pe      = ["10.0.6.32/29"]
-      #   }
-      # }
-      # prod = {
-      #   vnet_address_space = ["10.0.8.0/22"]
-      #   subnet_address_spaces = {
-      #     keyvault_pe        = ["10.0.10.16/29"]
-      #     cosmosdb_pe        = ["10.0.10.24/29"]
-      #     sql_server_pe      = ["10.0.10.32/29"]
-      #   }
-      # }
+      qa = {
+        vnet_address_space = ["10.0.12.64/26"]
+        subnet_address_spaces = {
+          keyvault_pe        = ["10.0.12.64/29"]
+          cosmosdb_pe        = ["10.0.12.72/29"]
+          datalake_pe        = ["10.0.12.80/29"]
+          databricks_private = ["10.0.12.96/28"]
+          databricks_public  = ["10.0.12.112/28"]
+        }
+      }
+      prod = {
+        vnet_address_space = ["10.0.12.128/26"]
+        subnet_address_spaces = {
+          keyvault_pe        = ["10.0.12.136/29"]
+          cosmosdb_pe        = ["10.0.12.144/29"]
+          datalake_pe        = ["10.0.12.152/29"]
+          databricks_private = ["10.0.12.168/28"]
+          databricks_public  = ["10.0.12.184/28"]
+        }
+      }
     }
   }
-
 }
 
 resource "azurerm_virtual_network" "main" {
