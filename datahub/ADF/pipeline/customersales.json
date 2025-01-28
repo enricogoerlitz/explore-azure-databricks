@@ -41,6 +41,29 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "Filter by run",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get metadata').output.firstRow.tables",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().run, true)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
