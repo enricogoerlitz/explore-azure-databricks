@@ -1,0 +1,9 @@
+{
+	"name": "customersales",
+	"properties": {
+		"folder": {
+			"name": "etl/medallion"
+		},
+		"annotations": []
+	}
+}
