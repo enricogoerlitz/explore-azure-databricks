@@ -144,7 +144,7 @@
 									"parameters": {
 										"container": "bronze",
 										"schema": {
-											"value": "@concat(\n    activity('Get metadata').output.firstRow.name,\n    '_',\n    coalesce(\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n        )\n    )",
+											"value": "@concat(\n    activity('Get metadata').output.firstRow.name,\n    '/',\n    coalesce(\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n        )\n    )",
 											"type": "Expression"
 										},
 										"tablename": {
