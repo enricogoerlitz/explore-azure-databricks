@@ -87,6 +87,8 @@
 						{
 							"name": "Load table",
 							"type": "Copy",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
@@ -154,6 +156,75 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "Silver ingestion",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "Load table",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/rico.goerlitz@gmail.com/explore-azure-databricks-project/datahub/databricks/git/100 etl/002 CUSTOMERSALES/CUSTOMERSALES - BASE PARAM SILVERINGESTION",
+								"baseParameters": {
+									"HISTORIZE": {
+										"value": "@coalesce(\n    item()?.historize,\n    true\n)",
+										"type": "Expression"
+									},
+									"SOURCE_LAKEHOUSE": {
+										"value": "@pipeline().parameters.bronzeLakehouse",
+										"type": "Expression"
+									},
+									"SOURCE_SCHEMA": {
+										"value": "@concat(\n    coalesce(\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n    )\n)",
+										"type": "Expression"
+									},
+									"SOURCE_TABLENAME": {
+										"value": "@coalesce(\n    item().bronze?.tablename,\n    item().source?.tablename\n)\n",
+										"type": "Expression"
+									},
+									"DESTINATION_LAKEHOUSE": {
+										"value": "@pipeline().parameters.silverLakehouse",
+										"type": "Expression"
+									},
+									"DESTINATION_SCHEMA": {
+										"value": "@concat(\n    coalesce(\n        item().silver.notebook?.schema,\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n    )\n)",
+										"type": "Expression"
+									},
+									"DESTINATION_TABLENAME": {
+										"value": "@coalesce(\n    item().silver?.notebook?.tablename,\n    item().bronze?.tablename,\n    item().source.tablename\n)\n",
+										"type": "Expression"
+									},
+									"NK_COLUMNS": "@item().silver.notebook.nk_columns",
+									"IS_DELTA_LOAD": "false",
+									"DELTA_LOAD_USE_BROADCAST": "false",
+									"EXCLUDE_COLUMNS_FROM_COMPARING": {
+										"value": "@coalesce(\n    item().silver.notebook?.exclude_columns_from_comparing,\n    null\n)",
+										"type": "Expression"
+									},
+									"INCLUDE_COLUMNS_FROM_COMPARING": {
+										"value": "@coalesce(\n    item().silver.notebook?.include_columns_from_comparing,\n    null\n)",
+										"type": "Expression"
+									},
+									"PARTITION_BY_COLUMNS": "@coalesce(\n    item().silver.notebook?.partition_by,\n    null\n)"
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ADB_DEV_CustomerSalesWS",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}
@@ -167,6 +238,14 @@
 			"metadataFilename": {
 				"type": "string",
 				"defaultValue": "metadata.customersales.import.v1.json"
+			},
+			"bronzeLakehouse": {
+				"type": "string",
+				"defaultValue": "customersales"
+			},
+			"silverLakehouse": {
+				"type": "string",
+				"defaultValue": "silver"
 			}
 		},
 		"folder": {
