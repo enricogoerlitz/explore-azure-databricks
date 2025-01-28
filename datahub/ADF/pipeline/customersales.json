@@ -180,7 +180,7 @@
 								"notebookPath": "/Users/rico.goerlitz@gmail.com/explore-azure-databricks-project/datahub/databricks/git/100 etl/002 CUSTOMERSALES/CUSTOMERSALES - BASE PARAM SILVERINGESTION",
 								"baseParameters": {
 									"HISTORIZE": {
-										"value": "@coalesce(\n    item()?.historize,\n    true\n)",
+										"value": "@coalesce(\n    string(item()?.historize),\n    'true'\n)",
 										"type": "Expression"
 									},
 									"SOURCE_LAKEHOUSE": {
@@ -208,8 +208,11 @@
 										"type": "Expression"
 									},
 									"NK_COLUMNS": "@item().silver.notebook.nk_columns",
-									"IS_DELTA_LOAD": "false",
-									"DELTA_LOAD_USE_BROADCAST": "false",
+									"IS_DELTA_LOAD": {
+										"value": "@string('false')",
+										"type": "Expression"
+									},
+									"DELTA_LOAD_USE_BROADCAST": "@string('false')",
 									"EXCLUDE_COLUMNS_FROM_COMPARING": {
 										"value": "@coalesce(\n    item().silver.notebook?.exclude_columns_from_comparing,\n    null\n)",
 										"type": "Expression"
