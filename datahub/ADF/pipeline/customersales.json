@@ -180,7 +180,7 @@
 								"notebookPath": "/Users/rico.goerlitz@gmail.com/explore-azure-databricks-project/datahub/databricks/git/100 etl/002 CUSTOMERSALES/CUSTOMERSALES - BASE PARAM SILVERINGESTION",
 								"baseParameters": {
 									"HISTORIZE": {
-										"value": "@coalesce(\n    string(item()?.historize),\n    'true'\n)",
+										"value": "@string(\n    coalesce(\n        item()?.historize,\n        'true'\n    )\n)",
 										"type": "Expression"
 									},
 									"SOURCE_LAKEHOUSE": {
@@ -208,20 +208,20 @@
 										"type": "Expression"
 									},
 									"NK_COLUMNS": "@item().silver.notebook.nk_columns",
-									"IS_DELTA_LOAD": {
-										"value": "@string('false')",
-										"type": "Expression"
-									},
-									"DELTA_LOAD_USE_BROADCAST": "@string('false')",
+									"IS_DELTA_LOAD": "false",
+									"DELTA_LOAD_USE_BROADCAST": "false",
 									"EXCLUDE_COLUMNS_FROM_COMPARING": {
-										"value": "@coalesce(\n    item().silver.notebook?.exclude_columns_from_comparing,\n    null\n)",
+										"value": "@coalesce(\n    item().silver.notebook?.exclude_columns_from_comparing,\n    ''\n)",
 										"type": "Expression"
 									},
 									"INCLUDE_COLUMNS_FROM_COMPARING": {
-										"value": "@coalesce(\n    item().silver.notebook?.include_columns_from_comparing,\n    null\n)",
+										"value": "@coalesce(\n    item().silver.notebook?.include_columns_from_comparing,\n    ''\n)",
 										"type": "Expression"
 									},
-									"PARTITION_BY_COLUMNS": "@coalesce(\n    item().silver.notebook?.partition_by,\n    null\n)"
+									"PARTITION_BY_COLUMNS": {
+										"value": "@coalesce(\n    item().silver.notebook?.partition_by,\n    ''\n)",
+										"type": "Expression"
+									}
 								}
 							},
 							"linkedServiceName": {
