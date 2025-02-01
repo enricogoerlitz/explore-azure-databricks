@@ -1,0 +1,7 @@
+{
+	"name": "ADLS2_DEV_DATAHUB",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/012e925b-f538-41ef-8d23-b0c85e7dbe7b/resourceGroups/explore-azure-databricks-dh-dev-weu-rg/providers/Microsoft.Storage/storageAccounts/eadbdldevweusa",
+		"groupId": "dfs"
+	}
+}

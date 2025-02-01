@@ -1,37 +1,22 @@
-# 🎓 Project: expore-azure-databricks
+# 🎓 Project: explore-azure-databricks
 
 [![Build and Push restapi Image](https://github.com/enricogoerlitz/explore-azure-databricks-project/actions/workflows/build-push-image.restapi.yml/badge.svg)](https://github.com/enricogoerlitz/explore-azure-databricks-project/actions/workflows/build-push-image.restapi.yml)
+[![Push Metadata to Azure Storage](https://github.com/enricogoerlitz/explore-azure-databricks-project/actions/workflows/push-metadata.datahub.yml/badge.svg)](https://github.com/enricogoerlitz/explore-azure-databricks-project/actions/workflows/push-metadata.datahub.yml)
 
-# ------ REFACTORING BACKEND
+## Project Architecture
 
-- RESTAPI
-    - add keyvault request => get DB Username & Password
-- 
+### High Level Project Overview
 
+![High-Level Conceptual Architecture of the Project](resources/architecture/concept-architecture.drawio.png)
 
-## Motivation
+### CustomerSales Backend Architecture
 
-## What is this project about
+![CustomerSales Backend Architecture](resources/architecture/customer-sales-backend-architecture.drawio.png)
 
-# Project architecture
+### CustomerSales Datahub Architecture
 
-## High level project overview
+![CustomerSales Backend Architecture](resources/architecture/datahub-architecture.drawio.png)
 
-concept-diagram of the project
+### CustomerSales Data model
 
-## Data model
-
-![Data Model](resources/architecture/datamodel-sales-v1.drawio.svg)
-
-## Azure component architecture
-
-### Project concept architecture
-
-
-![Data Model](resources/architecture/concept-architecture-v1.drawio.svg)
-
-
-## Backend Configuration
-
-### Prerequisites
-...
+![Customer Sales Data Model Diagram](resources/architecture/datamodel-sales.drawio.png)

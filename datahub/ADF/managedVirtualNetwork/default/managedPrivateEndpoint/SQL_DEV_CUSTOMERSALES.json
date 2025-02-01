@@ -1,0 +1,7 @@
+{
+	"name": "SQL_DEV_CUSTOMERSALES",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/012e925b-f538-41ef-8d23-b0c85e7dbe7b/resourceGroups/explore-azure-databricks-be-dev-weu-rg/providers/Microsoft.Sql/servers/eadb-dev-weu-sqls",
+		"groupId": "sqlServer"
+	}
+}
