@@ -1,0 +1,77 @@
+name: Push Metadata to Azure Storage
+
+on:
+  push:
+    branches:
+      - noexecution
+      # - dev
+  pull_request:
+    branches:
+      - noexecution
+      # - dev
+      # - qa
+      # - main
+
+jobs:
+  push-metadata:
+    runs-on: ubuntu-latest
+
+    env:
+      containerName: 'datahub-metadata'
+      basePath: 'datahub/metadata/meta/pipelines'
+      AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Determine Branch Name
+      run: |
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          echo "branchName=${{ github.base_ref }}" >> $GITHUB_ENV
+        else
+          echo "branchName=${{ github.ref_name }}" >> $GITHUB_ENV
+        fi
+
+    - name: Set storageAccountName
+      run: echo "storageAccountName=eadbmd${branchName}weusa" >> $GITHUB_ENV
+
+    - name: Set blobPath
+      run: echo "blobPath=${branchName}/" >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+
+    - name: Install python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r datahub/metadata/requirements.txt
+
+    - name: Execute python tests
+      run: |
+        python datahub/metadata/tests/run.py
+
+    - name: Debug Show Storage Key
+      run: |
+        echo $AZURE_STORAGE_KEY
+
+    - name: Upload files to Azure Storage
+      run: |
+        echo "Uploading file to Azure Storage..."
+        for file in $(find $GITHUB_WORKSPACE/$basePath -type f); do
+          relativePath=${file#$GITHUB_WORKSPACE/}
+          blobFilePath=$(echo "$relativePath" | sed "s|^|$blobPath|")
+
+          az storage blob upload \
+            --account-name $storageAccountName \
+            --container-name $containerName \
+            --file "$file" \
+            --name "$blobFilePath" \
+            --overwrite \
+            --auth-mode key \
+            --account-key $AZURE_STORAGE_KEY
+        done
+      env:
+        AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}

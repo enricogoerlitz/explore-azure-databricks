@@ -1,0 +1,34 @@
+{
+	"name": "MetadataRepository",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BLOB_DEV_MetadataRepository",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"env": {
+				"type": "string"
+			},
+			"metadataFilename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().metadataFilename",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat(\n    dataset().env,\n    '/datahub/metadata/meta/pipelines/import'\n)",
+					"type": "Expression"
+				},
+				"container": "datahub-metadata"
+			}
+		},
+		"schema": {}
+	}
+}

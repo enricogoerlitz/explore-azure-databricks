@@ -1,0 +1,262 @@
+{
+	"name": "customersales",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get metadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "MetadataRepository",
+						"type": "DatasetReference",
+						"parameters": {
+							"env": {
+								"value": "@pipeline().parameters.env",
+								"type": "Expression"
+							},
+							"metadataFilename": {
+								"value": "@pipeline().parameters.metadataFilename",
+								"type": "Expression"
+							}
+						}
+					}
+				}
+			},
+			{
+				"name": "Filter by run",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get metadata').output.firstRow.tables",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().run, true)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Import tables",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter by run",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter by run').output.Value",
+						"type": "Expression"
+					},
+					"batchCount": 10,
+					"activities": [
+						{
+							"name": "Load table",
+							"type": "Copy",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "CustomerSalesTables",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@coalesce(\n    item().source?.schema,\n    activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema )",
+											"type": "Expression"
+										},
+										"tablename": {
+											"value": "@item().source.tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "CustomerSalesDataLake",
+									"type": "DatasetReference",
+									"parameters": {
+										"container": "bronze",
+										"schema": {
+											"value": "@concat(\n    activity('Get metadata').output.firstRow.name,\n    '/',\n    coalesce(\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n        )\n    )",
+											"type": "Expression"
+										},
+										"tablename": {
+											"value": "@concat(\n    coalesce(\n        item().bronze?.tablename,\n        item().source.tablename\n    ),\n    '.parquet'\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Silver ingestion",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "Load table",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/rico.goerlitz@gmail.com/explore-azure-databricks-project/datahub/databricks/git/100 etl/002 CUSTOMERSALES/CUSTOMERSALES - BASE PARAM SILVERINGESTION",
+								"baseParameters": {
+									"HISTORIZE": {
+										"value": "@string(\n    coalesce(\n        item()?.historize,\n        'true'\n    )\n)",
+										"type": "Expression"
+									},
+									"SOURCE_LAKEHOUSE": {
+										"value": "@pipeline().parameters.bronzeLakehouse",
+										"type": "Expression"
+									},
+									"SOURCE_SCHEMA": {
+										"value": "@concat(\n    coalesce(\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n    )\n)",
+										"type": "Expression"
+									},
+									"SOURCE_TABLENAME": {
+										"value": "@coalesce(\n    item().bronze?.tablename,\n    item().source?.tablename\n)\n",
+										"type": "Expression"
+									},
+									"DESTINATION_LAKEHOUSE": {
+										"value": "@pipeline().parameters.silverLakehouse",
+										"type": "Expression"
+									},
+									"DESTINATION_SCHEMA": {
+										"value": "@concat(\n    coalesce(\n        item().silver.notebook?.schema,\n        item().bronze?.schema,\n        item().source?.schema,\n        activity('Get metadata').output.firstRow.importSettings.dataHub?.defaultSchema,\n        activity('Get metadata').output.firstRow.importSettings.sourceSystem.defaultSchema\n    )\n)",
+										"type": "Expression"
+									},
+									"DESTINATION_TABLENAME": {
+										"value": "@coalesce(\n    item().silver?.notebook?.tablename,\n    item().bronze?.tablename,\n    item().source.tablename\n)\n",
+										"type": "Expression"
+									},
+									"NK_COLUMNS": {
+										"value": "@item().silver.notebook.nk_columns",
+										"type": "Expression"
+									},
+									"IS_DELTA_LOAD": "false",
+									"DELTA_LOAD_USE_BROADCAST": "false",
+									"EXCLUDE_COLUMNS_FROM_COMPARING": {
+										"value": "@coalesce(\n    item().silver.notebook?.exclude_columns_from_comparing,\n    ''\n)",
+										"type": "Expression"
+									},
+									"INCLUDE_COLUMNS_FROM_COMPARING": {
+										"value": "@coalesce(\n    item().silver.notebook?.include_columns_from_comparing,\n    ''\n)",
+										"type": "Expression"
+									},
+									"PARTITION_BY_COLUMNS": {
+										"value": "@coalesce(\n    item().silver.notebook?.partition_by,\n    ''\n)",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ADB_DEV_CustomerSalesWS",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"env": {
+				"type": "string",
+				"defaultValue": "dev"
+			},
+			"metadataFilename": {
+				"type": "string",
+				"defaultValue": "metadata.customersales.import.v1.json"
+			},
+			"bronzeLakehouse": {
+				"type": "string",
+				"defaultValue": "customersales"
+			},
+			"silverLakehouse": {
+				"type": "string",
+				"defaultValue": "silver"
+			}
+		},
+		"folder": {
+			"name": "etl/medallion"
+		},
+		"annotations": []
+	}
+}

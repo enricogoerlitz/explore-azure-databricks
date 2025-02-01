@@ -1,25 +1,20 @@
-variable "resource_group_name" {
-  description = "The name of the resource group"
+variable "project_resourcegroup_name" {
+  description = "The name of the resource group for the project"
   type        = string
+  default     = "explore-azure-databricks-project-euwest-rg"
+
 }
 
-variable "location" {
-  description = "The Azure region where resources will be created"
-  type        = string
-  default     = "East US"
+variable "default_tags" {
+  description = "The default tags for all resources"
+  type        = map(string)
+  default = {
+    "project" = "explore-azure-databricks"
+  }
 }
 
-variable "storage_account_name" {
-  description = "The name of the storage account"
+variable "westeurope_location" {
+  description = "The location for the resources"
   type        = string
-}
-
-variable "container_name" {
-  description = "The name of the blob storage container"
-  type        = string
-}
-
-variable "access_key" {
-  description = "The access key for the storage account"
-  type        = string
+  default     = "westeurope"
 }

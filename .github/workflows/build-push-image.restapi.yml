@@ -3,12 +3,14 @@ name: Build and Push restapi Image
 on:
   push:
     branches:
-      - dev
+      - noexecution
+      # - dev
   pull_request:
     branches:
-      - dev
-      - qa
-      - main
+      - noexecution
+      # - dev
+      # - qa
+      # - main
 
 jobs:
   build-and-push-restapi:

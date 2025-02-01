@@ -1,18 +1,18 @@
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
-  location = "East US"
-}
+resource "azurerm_resource_group" "main" {
+  name     = "explore-azure-databricks-dh-${terraform.workspace}-weu-rg"
+  location = var.westeurope_location
 
-resource "azurerm_storage_account" "example" {
-  name                     = "examplestoracc"
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier            = "Standard"
-  account_replication_type = "LRS"
-}
+  tags = merge(var.default_tags, {
+    "env" = terraform.workspace
+  })
 
-resource "azurerm_storage_container" "example" {
-  name                  = "tfstate"
-  storage_account_name  = azurerm_storage_account.example.name
-  container_access_type = "private"
+  lifecycle {
+    precondition {
+      condition = contains(
+        ["dev", "qa", "prod"],
+        terraform.workspace
+      )
+      error_message = "The workspace (env) should be either dev, qa, or prod."
+    }
+  }
 }

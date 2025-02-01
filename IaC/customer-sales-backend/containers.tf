@@ -62,7 +62,7 @@ resource "azurerm_container_app" "main" {
       name   = "customersales-restapi"
       image  = "${var.project_acr_url}/restapi:v1-${terraform.workspace}"
       cpu    = 0.5
-      memory = "1.5Gi"
+      memory = "1Gi"
 
       env {
         name  = "MODE"
