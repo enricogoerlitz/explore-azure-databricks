@@ -46,6 +46,8 @@ $ tfapply
 
 ### 3. Setup databricks
 
+0. Setup Unity Catalog: [Link to account console (use ".onmicrosoft" account)](https://accounts.azuredatabricks.net/)
+
 1. Create Compute Cluster
 2. Create Secret Scope
     - #secrets/createScope

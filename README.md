@@ -7,12 +7,16 @@
 
 ### High Level Project Overview
 
-![High-Level Conceptual Architecture of the Project](resources/architecture/concept-architecture-v1.drawio.svg)
+![High-Level Conceptual Architecture of the Project](resources/architecture/concept-architecture.drawio.png)
 
 ### CustomerSales Backend Architecture
 
-![CustomerSales Backend Architecture](resources/architecture/customer-sales-backend-v1.drawio.svg)
+![CustomerSales Backend Architecture](resources/architecture/customer-sales-backend-architecture.drawio.png)
+
+### CustomerSales Datahub Architecture
+
+![CustomerSales Backend Architecture](resources/architecture/datahub-architecture.drawio.png)
 
 ### CustomerSales Data model
 
-![Customer Sales Data Model Diagram](resources/architecture/datamodel-sales-v1.drawio.svg)
+![Customer Sales Data Model Diagram](resources/architecture/datamodel-sales.drawio.png)
